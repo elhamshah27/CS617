@@ -56,4 +56,37 @@
                             counts[c.OFFENSE_DESCRIPTION] = (counts[c.OFFENSE_DESCRIPTION] || 0) + 1;
                         });
                         
-                        const myTop10 = Object
+                        const myTop10 = Object.entries(counts)
+                            .sort((a,b) => b[1] - a[1])
+                            .slice(0, 10);
+
+                        const barTrace = {
+                            x: myTop10.map(d => d[1]),
+                            y: myTop10.map(d => d[0]),
+                            type: 'bar',
+                            orientation: 'h',
+                            marker: { color: '#b30000' }
+                        };
+
+                        const barLayout = {
+                            title: 'My Top 10 Most Frequent Crimes',
+                            xaxis: { title: 'Number of Incidents' },
+                            yaxis: { automargin: true }
+                        };
+
+                        Plotly.newPlot('barchart', [barTrace], barLayout).then(gd => {
+                            // My Bonus Logic: Linking the charts
+                            gd.on('plotly_click', function(eventData){
+                                const mySelectedCrime = eventData.points[0].y;
+                                const myFilteredSelection = myFullDataset.filter(d => d.OFFENSE_DESCRIPTION === mySelectedCrime);
+                                renderMyCharts(myFilteredSelection);
+                            });
+                        });
+                    }
+                }
+
+                renderMyCharts(myFullDataset, true);
+            });
+    </script>
+</body>
+</html>
