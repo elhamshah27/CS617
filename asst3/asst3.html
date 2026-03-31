@@ -1,1 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>The Dangerous Hours</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body { font-family: sans-serif; margin: 20px; }
+        .chart-container { margin-bottom: 50px; }
+    </style>
+</head>
+<body>
+    <h1>The Dangerous Hours: Boston Crime Story</h1>
 
+    <div id="heatmap" class="chart-container"></div>
+
+    <div id="barchart" class="chart-container"></div>
+
+    <script>
+        fetch('dangerous_hours.json')
+            .then(response => response.json())
+            .then(data => {
+                const hours = data.map(d => d.hour);
+                const crimes = data.map(d => d.OFFENSE_DESCRIPTION);
+
+                // --- CHART 1: HEATMAP ---
+                const heatmapTrace = {
+                    x: hours,
+                    y: crimes,
+                    type: 'histogram2d',
+                    colorscale: 'Reds'
+                };
+
+                const heatmapLayout = {
+                    title: 'Crime Distribution by Hour (The Pulse)',
+                    xaxis: { title: 'Hour of Day (0-23)', dtick: 1 },
+                    yaxis: { automargin: true },
+                    height: 600
+                };
+
+                Plotly.newPlot('heatmap', [heatmapTrace], heatmapLayout);
+
+                // --- CHART 2: TOP CRIMES BAR CHART ---
+                // We calculate the top 10 crimes from your data
+                const counts = {};
+                crimes.forEach(c => counts[c] = (counts[c] || 0) + 1);
+                
+                const sortedCrimes = Object.entries(counts)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 10);
+
+                const barTrace = {
+                    x: sortedCrimes.map(d => d[1]),
+                    y: sortedCrimes.map(d => d[0]),
+                    type: 'bar',
+                    orientation: 'h',
+                    marker: { color: 'darkred' }
+                };
+
+                const barLayout = {
+                    title: 'Top 10 Crimes in this Dataset',
+                    xaxis: { title: 'Number of Occurrences' },
+                    yaxis: { automargin: true },
+                    height: 400
+                };
+
+                Plotly.newPlot('barchart', [barTrace], barLayout);
+            });
+    </script>
+</body>
+</html>
