@@ -1,1 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Boston Crime Analysis</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body { font-family: sans-serif; margin: 30px; background-color: #f8f9fa; }
+        .chart-box { background: white; padding: 15px; margin-bottom: 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #b30000; }
+        p { text-align: center; font-style: italic; }
+    </style>
+</head>
+<body>
 
+    <h1>My Analysis: The Dangerous Hours in Boston</h1>
+    <p>Click on any bar in my second chart to filter my heatmap by that specific crime.</p>
+
+    <div class="chart-box">
+        <div id="heatmap" style="height:600px;"></div>
+    </div>
+
+    <div class="chart-box">
+        <div id="barchart" style="height:450px;"></div>
+    </div>
+
+    <script>
+        fetch('dangerous_hours.json')
+            .then(response => response.json())
+            .then(data => {
+                const myFullDataset = data;
+
+                function renderMyCharts(filteredData, isFirstLoad = false) {
+                    const hours = filteredData.map(d => d.hour);
+                    const crimes = filteredData.map(d => d.OFFENSE_DESCRIPTION);
+
+                    // --- MY HEATMAP ---
+                    const heatmapTrace = {
+                        x: hours,
+                        y: crimes,
+                        type: 'histogram2d',
+                        colorscale: 'Reds'
+                    };
+
+                    const heatmapLayout = {
+                        title: 'My Overview of Crime Density by Hour',
+                        xaxis: { title: 'Hour of Day (0-23)', dtick: 1 },
+                        yaxis: { automargin: true }
+                    };
+
+                    Plotly.newPlot('heatmap', [heatmapTrace], heatmapLayout);
+
+                    // --- MY BAR CHART ---
+                    if (isFirstLoad) {
+                        const counts = {};
+                        myFullDataset.forEach(c => {
+                            counts[c.OFFENSE_DESCRIPTION] = (counts[c.OFFENSE_DESCRIPTION] || 0) + 1;
+                        });
+                        
+                        const myTop10 = Object
