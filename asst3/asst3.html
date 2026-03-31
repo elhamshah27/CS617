@@ -22,7 +22,7 @@
                 const hours = data.map(d => d.hour);
                 const crimes = data.map(d => d.OFFENSE_DESCRIPTION);
 
-                // --- CHART 1: HEATMAP ---
+                // CHART 1: HEATMAP
                 const heatmapTrace = {
                     x: hours,
                     y: crimes,
@@ -39,8 +39,8 @@
 
                 Plotly.newPlot('heatmap', [heatmapTrace], heatmapLayout);
 
-                // --- CHART 2: TOP CRIMES BAR CHART ---
-                // We calculate the top 10 crimes from your data
+                // CHART 2: TOP CRIMES BAR CHART
+                // calculate the top 10 crimes from data
                 const counts = {};
                 crimes.forEach(c => counts[c] = (counts[c] || 0) + 1);
                 
